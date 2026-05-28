@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Castelo Forte – Complemento de Areia</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;900&family=Barlow:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<header>
+  <div class="logo-mark">CF</div>
+  <div>
+    <h1>Castelo Forte <span>Areia</span></h1>
+    <p>Sistema de Cálculo – Complemento de Nota</p>
+  </div>
+</header>
+
+<div class="container">
+
+  <!-- LINHA 1: LOJA + TIPO DE AREIA -->
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-title">🏪 Loja</div>
+      <div class="option-group" id="loja-group">
+        <label class="option-label"><input type="radio" name="loja" value="Castelo Forte SAMAMBAIA" checked>
+          <div class="option-btn"><span class="dot"></span>CFS – Samambaia</div></label>
+        <label class="option-label"><input type="radio" name="loja" value="Castelo Forte VICENTE PIRES">
+          <div class="option-btn"><span class="dot"></span>CFVP – Vicente Pires</div></label>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">🪨 Tipo de Areia</div>
+      <div class="option-group" id="areia-group">
+        <label class="option-label"><input type="radio" name="areia" value="FINA" checked>
+          <div class="option-btn"><span class="dot"></span>Fina</div></label>
+        <label class="option-label"><input type="radio" name="areia" value="MEDIA">
+          <div class="option-btn"><span class="dot"></span>Média</div></label>
+      </div>
+    </div>
+  </div>
+
+  <!-- LINHA 2: FORNECEDOR + DATA -->
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-title">🚚 Fornecedor</div>
+      <div class="option-group" id="forn-group">
+        <label class="option-label"><input type="radio" name="fornecedor" value="Rick & MILLA" checked>
+          <div class="option-btn"><span class="dot"></span>Rick &amp; MILLA</div></label>
+        <label class="option-label"><input type="radio" name="fornecedor" value="R & M MINERAÇÃO">
+          <div class="option-btn"><span class="dot"></span>R &amp; M MINERAÇÃO</div></label>
+        <label class="option-label"><input type="radio" name="fornecedor" value="outro">
+          <div class="option-btn"><span class="dot"></span>Outro</div></label>
+      </div>
+      <div class="forn-other" id="forn-other-wrap">
+        <div class="field">
+          <label>Nome do Fornecedor</label>
+          <input type="text" id="forn-outro-val" placeholder="Digite o nome...">
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">📅 Data de Entrega</div>
+      <div class="field">
+        <label>Data</label>
+        <input type="date" id="data-entrega">
+      </div>
+    </div>
+  </div>
+
+  <!-- PLACA DO CAMINHÃO -->
+  <div class="card">
+    <div class="card-title">🚛 Placa do Caminhão</div>
+    <div class="field">
+      <label>Placa Caminhão</label>
+      <div class="placa-search-wrap">
+        <input type="text" id="placa-input" placeholder="Ex: JGZ ou JGZ2665" oninput="searchPlaca(this.value)" onkeydown="placaKeyDown(event)" autocomplete="off" style="text-transform:uppercase">
+        <div class="placa-dropdown" id="placa-dropdown"></div>
+      </div>
+    </div>
+    <div class="placa-result" id="placa-result">
+      <strong id="placa-nome"></strong>
+      <div class="placa-info">
+        <span id="placa-transp-wrap">Transportadora: <b id="placa-transp"></b></span>
+      </div>
+    </div>
+    <div class="placa-notfound" id="placa-notfound">Placa não encontrada no banco de dados.</div>
+    <!-- Hidden inputs mantidos para compatibilidade com calcular() -->
+    <input type="hidden" id="largura">
+    <input type="hidden" id="comprimento">
+    <input type="hidden" id="pistao-toggle" value="0">
+    <input type="hidden" id="pistao-val" value="0">
+  </div>
+
+  <!-- FUROS DE PROFUNDIDADE -->
+  <div class="card">
+    <div class="card-title">📏 Furos de Profundidade</div>
+    <div class="furos-label-row">
+      <span>Lateral Esq.</span><span>Centro</span><span>Lateral Dir.</span>
+    </div>
+    <div id="furos-container"></div>
+    <button class="btn-add-furo" onclick="addFuroRow()">+ Adicionar Linha de Furos</button>
+    <div style="margin-top:14px; display:flex; gap:32px; flex-wrap:wrap;">
+      <div><span style="font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;">Média Profund.</span><br>
+        <span id="media-prof" style="font-size:22px;font-family:'Barlow Condensed',sans-serif;font-weight:700;color:var(--accent)">—</span><span style="color:var(--muted);font-size:13px;"> m</span></div>
+    </div>
+  </div>
+
+  <!-- NÚMERO DA NOTA -->
+  <div class="card">
+    <div class="card-title">📄 Nota Fiscal</div>
+    <div class="field">
+      <label>Número da Nota</label>
+      <input type="text" id="nota-numero" placeholder="Ex: 2395" oninput="gerarMensagem()" style="font-size:18px;font-weight:600;letter-spacing:1px;">
+    </div>
+  </div>
+
+  <!-- RESULTADOS -->
+  <div class="card">
+    <div class="card-title">📊 Resultados do Romaneio</div>
+    <div class="results-grid">
+      <div class="result-box">
+        <div class="label">Total M³ Romaneio</div>
+        <div class="val" id="res-m3">—</div>
+        <div class="unit">metros cúbicos</div>
+      </div>
+      <div class="result-box">
+        <div class="label">Total Toneladas</div>
+        <div class="val" id="res-ton">—</div>
+        <div class="unit">toneladas (× 1,5)</div>
+      </div>
+      <div class="result-box">
+        <div class="label">Total M³ Notas</div>
+        <div class="val" id="res-m3-notas">—</div>
+        <div class="unit">metros cúbicos</div>
+      </div>
+      <div class="result-box">
+        <div class="label">Complemento (M³)</div>
+        <div class="val" id="res-complemento">—</div>
+        <div class="unit">diferença romaneio – notas</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MENSAGEM GERADA -->
+  <div class="card">
+    <div class="card-title">💬 Mensagem para o Fornecedor</div>
+    <div class="message-box" id="mensagem-box">Preencha os campos acima para gerar a mensagem...</div>
+    <div style="display:flex;align-items:center;flex-wrap:wrap;gap:8px;margin-top:12px;">
+      <button class="btn-copy" onclick="copyMsg()">📋 Copiar Mensagem</button>
+      <span class="copied-badge" id="copied-badge">Copiado!</span>
+    </div>
+  </div>
+
+</div><!-- /container -->
+
+<script src="script.js"></script>
+</body>
+</html>
